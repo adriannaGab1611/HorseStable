@@ -1,4 +1,3 @@
-use [2019SBD]
 drop table zawody_kon;
 drop table nagroda;
 drop table wlasciciel_klub;
@@ -231,7 +230,7 @@ INSERT INTO Postac VALUES (12, 'Sara', 'Kot', 'kobieta', 22);
 INSERT INTO Postac VALUES (13, 'Jan', 'Got', 'mezczyzna', 34);
 
 
---Klub jeŸdziecki
+--Klub jeÅ¸dziecki
 INSERT INTO klub_jezdziecki VALUES (1, 'Podkowa');
 INSERT INTO klub_jezdziecki VALUES (2, 'Happy Horse');
 INSERT INTO klub_jezdziecki VALUES (3, 'Patataj');
@@ -259,7 +258,7 @@ INSERT INTO trener VALUES (3,3,3);
 INSERT INTO trener VALUES (4,4,4);
 INSERT INTO trener VALUES (5,5,5);
 
---W³aœciciel konia
+--WÂ³aÅ“ciciel konia
 INSERT INTO wlasciciel_konia VALUES (1,6);
 INSERT INTO wlasciciel_konia VALUES (2,7);
 INSERT INTO wlasciciel_konia VALUES (3,8);
@@ -269,7 +268,7 @@ INSERT INTO wlasciciel_konia VALUES (6,11);
 INSERT INTO wlasciciel_konia VALUES (7,12);
 INSERT INTO wlasciciel_konia VALUES (8,13);
 
---Koñ
+--KoÃ±
 INSERT INTO kon VALUES (1, 'Hera', 6, 'klacz', CONVERT(DATETIME,'2015/12/12'), 1, 1, 1);
 INSERT INTO kon VALUES (2, 'Demeter', 7, 'klacz', CONVERT(DATETIME,'2014/10/12'), 1, 1, 1);
 INSERT INTO kon VALUES (3, 'Kronos', 8, 'ogier', CONVERT(DATETIME,'2013/05/06'), 2, 2, 1);
@@ -280,7 +279,7 @@ INSERT INTO kon VALUES (7, 'Zeus', 6, 'ogier', CONVERT(DATETIME,'2015/12/11'), 6
 INSERT INTO kon VALUES (8, 'Apollo', 10, 'ogier', CONVERT(DATETIME, '2011/05/03'), 7, 4, 2);
 INSERT INTO kon VALUES (9, 'Hestia', 6, 'klacz', CONVERT(DATETIME,'2011/08/12'), 8, 2, 2);
 
---W³aœciciel_Klub
+--WÂ³aÅ“ciciel_Klub
 INSERT INTO wlasciciel_klub VALUES (1,1,CONVERT(DATETIME,'2013/05/06'),null);
 INSERT INTO wlasciciel_klub VALUES (1,2,CONVERT(DATETIME,'2016/08/12'),null);
 --INSERT INTO wlasciciel_klub VALUES (1,3,CONVERT(DATETIME,'2013/05/06'),null);
