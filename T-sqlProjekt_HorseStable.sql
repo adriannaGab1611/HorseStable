@@ -1,4 +1,4 @@
---1 Wypisze osi¹gniêcia w³aœciciela konia 
+--1 Writes owners awards
 
 CREATE PROCEDURE osiagniecia @wlasciciel int
 AS
@@ -14,7 +14,7 @@ SET @nazwisko = (SELECT nazwisko FROM postac WHERE id = @postacid);
 			WHILE @@FETCH_STATUS = 0
 			BEGIN
 				SET @imieK = (SELECT imie FROM Kon WHERE id = @konId);
-				PRINT 'Koñ: ' + @imieK;
+				PRINT 'KoÃ±: ' + @imieK;
 				DECLARE kursor3 CURSOR FOR SELECT Zawody_skokowe_ID, Pozycja_w_zawodach, Nagroda_id FROM Zawody_kon WHERE kon_id = @konId
 				OPEN kursor3;	
 				FETCH NEXT FROM kursor3 INTO @numerZaw, @pozycja, @nagrodaId;
@@ -42,7 +42,7 @@ END;
 drop procedure osiagniecia;
 EXEC osiagniecia 1;
 
---2 Na potrzeby remonu wszystkie konie s¹ transportowane z starej stadniny do nowej 
+--2 Transport horses from one stable to another
 CREATE PROCEDURE przeprowadzka @obecna varchar(100), @docelowa varchar(100)
 AS
 BEGIN
@@ -79,7 +79,7 @@ END;
 EXEC przeprowadzka2 'Konikowy Raj', 'Dworek';
 SELECT * FROM Kon k INNER JOIN stadnina s ON k.stadnina_id = s.id;
 
---3 Dla zawodów wybranych w argumencie procedury za 2 miejsce bêdzie dodatkowa nagroda w postaci 100 z³, a najlepszy koñ otrzyma dodatkowo 1000 z³ 
+--3 For selected competitions for 2 place additional award 100 PLN, the best horse gets additional 1000 PLN
 
 CREATE PROCEDURE premia @zawody int
 AS
@@ -110,7 +110,7 @@ DEALLOCATE kursorP
 END;
 ELSE 
 	BEGIN 
-	Raiserror('Takie zawody siê nie odby³y',1,2);
+	Raiserror('This competition did not take place',1,2);
 	END;
 END;
 
@@ -118,7 +118,8 @@ drop procedure premia;
 EXEC premia 3
 SELECT * FROM zawody_kon k INNER JOIN nagroda s ON k.nagroda_id = s.id;
 
---4 wyzwalacz nie pozwoli na dodanie do klubu jeŸdzieckiego w³aœciciela konia który ma mniej ni¿ 18 lat
+--4 trigger will not allow to add the owner under 18 years old to horse club 
+
 CREATE TRIGGER wiek18 
 ON Wlasciciel_klub
 FOR INSERT 
@@ -131,7 +132,7 @@ BEGIN
 	IF @wiek < 18
 		BEGIN
 		ROLLBACK;
-		Raiserror('Nie przyjmujemy do klubu poni¿ej 18 roku ¿ycia',1,2);
+		Raiserror('Cannot add owner under 18 years old',1,2);
 		END;
 END;
 
@@ -140,7 +141,7 @@ drop trigger wiek18;
 INSERT INTO Wlasciciel_klub VALUES(1, 7, '2018/09/09',null)
 INSERT INTO Wlasciciel_klub VALUES(2, 2, '2019/09/09',null)
 
---5 wyzwalacz nie pozwoli na usuniêcie konia rasy Haflinger 
+--5 trigger will not allow to delete Haflinger horse
 CREATE TRIGGER usun 
 ON kon
 FOR DELETE 
@@ -149,7 +150,7 @@ BEGIN
 	IF EXISTS (SELECT 1 FROM deleted WHERE rasa_id = (SELECT id FROM rasa WHERE nazwa = 'Haflinger'))
 		BEGIN
 		ROLLBACK;
-		Raiserror('Konie Haflingera s¹ potrzebne w naszej stadninie wiêc ich nie oddajemy',1,2);
+		Raiserror('Cannot delete Haflinger horse',1,2);
 		END;
 END;
 
