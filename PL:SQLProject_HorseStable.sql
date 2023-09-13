@@ -16,7 +16,7 @@ dbms_output.put_line(v_imie || ' ' || v_nazwisko);
 		FETCH cursor2 INTO v_konId;
 		EXIT WHEN cursor2%NOTFOUND;
         SELECT imie INTO v_imieK FROM Kon WHERE id = v_konId;
-        dbms_output.put_line('Koñ: ' || v_imieK);
+        dbms_output.put_line('Kon: ' || v_imieK);
         OPEN cursor3;	
             LOOP
                 FETCH cursor3 INTO v_numerZaw, v_pozycja, v_nagrodaId;
@@ -36,7 +36,7 @@ END;
 
 CALL awards (1);
 
---2 Na potrzeby remonu wszystkie konie s¹ transportowane z starej stadniny do nowej 
+--2 Transports the horses from one stable to another
 CREATE OR REPLACE PROCEDURE transport2 (v_obecna varchar2, v_docelowa varchar2)
 AS
 temp int;
@@ -50,7 +50,7 @@ END;
 CALL transport2('Konikowy Raj', 'Dworek');
 SELECT * FROM Kon k INNER JOIN stadnina s ON k.stadnina_id = s.id;
 
---3  
+--3  For selected competitions for 2 place additional award 100 PLN, the best horse gets additional 1000 PLN
 
 CREATE OR REPLACE PROCEDURE bonus (v_zawody int)
 AS
