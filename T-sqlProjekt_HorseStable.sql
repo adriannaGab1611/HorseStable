@@ -1,6 +1,6 @@
 --1 Writes owners awards
 
-CREATE PROCEDURE osiagniecia @wlasciciel int
+CREATE PROCEDURE awards @wlasciciel int
 AS
 BEGIN
 DECLARE @postacid int, @konId int, @imie varchar(100), @nazwisko varchar(100), @imieK varchar(100), @numerZaw int, @pozycja int, @nagrodaId int ,@medal varchar(100);
@@ -8,16 +8,16 @@ SET @postacid = (SELECT id FROM Wlasciciel_konia WHERE ID = @wlasciciel)
 SET @imie = (SELECT imie FROM Postac WHERE id = @postacid);
 SET @nazwisko = (SELECT nazwisko FROM postac WHERE id = @postacid);
 		PRINT @imie + ' ' + @nazwisko; 
-		DECLARE kursor2 CURSOR FOR SELECT id FROM kon WHERE Wlasciciel_konia_ID = @postacid
-		OPEN kursor2;	
-		FETCH NEXT FROM kursor2 INTO @konId;
+		DECLARE cursor2 CURSOR FOR SELECT id FROM kon WHERE Wlasciciel_konia_ID = @postacid
+		OPEN cursor2;	
+		FETCH NEXT FROM cursor2 INTO @konId;
 			WHILE @@FETCH_STATUS = 0
 			BEGIN
 				SET @imieK = (SELECT imie FROM Kon WHERE id = @konId);
-				PRINT 'Koñ: ' + @imieK;
-				DECLARE kursor3 CURSOR FOR SELECT Zawody_skokowe_ID, Pozycja_w_zawodach, Nagroda_id FROM Zawody_kon WHERE kon_id = @konId
-				OPEN kursor3;	
-				FETCH NEXT FROM kursor3 INTO @numerZaw, @pozycja, @nagrodaId;
+				PRINT 'Kon: ' + @imieK;
+				DECLARE cursor3 CURSOR FOR SELECT Zawody_skokowe_ID, Pozycja_w_zawodach, Nagroda_id FROM Zawody_kon WHERE kon_id = @konId
+				OPEN cursor3;	
+				FETCH NEXT FROM cursor3 INTO @numerZaw, @pozycja, @nagrodaId;
 					WHILE @@FETCH_STATUS = 0
 						BEGIN
 						IF EXISTS (SELECT medal FROM Nagroda WHERE ID = @nagrodaId)
@@ -29,27 +29,28 @@ SET @nazwisko = (SELECT nazwisko FROM postac WHERE id = @postacid);
 								SET @medal = 'brak';
 							END;
 						PRINT 'Zawody: ' + CAST(@numerZaw as varchar) + ' Pozycja: ' + CAST(@pozycja as varchar) + ' Medal ' + @medal;
-						FETCH NEXT FROM kursor3 INTO @numerZaw, @pozycja, @nagrodaId;
+						FETCH NEXT FROM cursor3 INTO @numerZaw, @pozycja, @nagrodaId;
 						END;
-				CLOSE kursor3;
-				DEALLOCATE kursor3;
-			FETCH NEXT FROM kursor2 INTO @konId;
+				CLOSE cursor3;
+				DEALLOCATE cursor3;
+			FETCH NEXT FROM cursor2 INTO @konId;
 		END;
-		CLOSE kursor2;
-		DEALLOCATE kursor2;
+		CLOSE cursor2;
+		DEALLOCATE cursor2;
 END;
 
-drop procedure osiagniecia;
-EXEC osiagniecia 1;
+drop procedure awards;
+EXEC awards 1;
 
 --2 Transport horses from one stable to another
-CREATE PROCEDURE przeprowadzka @obecna varchar(100), @docelowa varchar(100)
+
+CREATE PROCEDURE transport @obecna varchar(100), @docelowa varchar(100)
 AS
 BEGIN
-DECLARE kursorP CURSOR FOR SELECT k.id, k.Stadnina_ID FROM kon k
+DECLARE cursorP CURSOR FOR SELECT k.id, k.Stadnina_ID FROM kon k
 DECLARE @idkon int, @idstadnina int;
-OPEN kursorP;
-FETCH NEXT FROM kursorP INTO @idkon, @idstadnina;
+OPEN cursorP;
+FETCH NEXT FROM cursorP INTO @idkon, @idstadnina;
 WHILE @@FETCH_STATUS = 0
 	BEGIN
 		IF @idstadnina = (SELECT s.id FROM Stadnina s WHERE s.Nazwa = @obecna)
@@ -59,15 +60,15 @@ WHILE @@FETCH_STATUS = 0
 			UPDATE kon SET stadnina_id =  (SELECT id FROM Stadnina WHERE Nazwa = @docelowa) WHERE id = @idkon
 			END;
 		END;
-	FETCH NEXT FROM kursorP INTO @idkon, @idstadnina;
+	FETCH NEXT FROM cursorP INTO @idkon, @idstadnina;
 	END;
-CLOSE kursorP;
-DEALLOCATE kursorP
+CLOSE cursorP;
+DEALLOCATE cursorP
 END;
 
-drop procedure przeprowadzka1;
+drop procedure transport1;
 
-CREATE PROCEDURE przeprowadzka2 @obecna varchar(100), @docelowa varchar(100)
+CREATE PROCEDURE transport2 @obecna varchar(100), @docelowa varchar(100)
 AS
 BEGIN
 IF EXISTS (SELECT s.id FROM Stadnina s WHERE s.Nazwa = @docelowa)
@@ -76,20 +77,20 @@ IF EXISTS (SELECT s.id FROM Stadnina s WHERE s.Nazwa = @docelowa)
 	END;
 END;
 
-EXEC przeprowadzka2 'Konikowy Raj', 'Dworek';
+EXEC transport2 'Konikowy Raj', 'Dworek';
 SELECT * FROM Kon k INNER JOIN stadnina s ON k.stadnina_id = s.id;
 
 --3 For selected competitions for 2 place additional award 100 PLN, the best horse gets additional 1000 PLN
 
-CREATE PROCEDURE premia @zawody int
+CREATE PROCEDURE bonus @zawody int
 AS
 BEGIN
-DECLARE kursorP CURSOR FOR SELECT k.Pozycja_w_zawodach, k.Nagroda_ID, Zawody_skokowe_ID FROM zawody_kon k
+DECLARE cursorP CURSOR FOR SELECT k.Pozycja_w_zawodach, k.Nagroda_ID, Zawody_skokowe_ID FROM zawody_kon k
 DECLARE @pozycja int, @nagrodaid int, @zawody_skok int;
 IF EXISTS (SELECT 1 FROM zawody_kon WHERE Zawody_skokowe_ID = @zawody) 
 BEGIN 
-OPEN kursorP;
-FETCH NEXT FROM kursorP INTO @pozycja, @nagrodaid, @zawody_skok;
+OPEN cursorP;
+FETCH NEXT FROM cursorP INTO @pozycja, @nagrodaid, @zawody_skok;
 WHILE @@FETCH_STATUS = 0
 	BEGIN
 		IF @zawody_skok = @zawody
@@ -103,10 +104,10 @@ WHILE @@FETCH_STATUS = 0
 				UPDATE Nagroda SET Nagroda_pieniezna = Nagroda_pieniezna + 100 WHERE id = @nagrodaid
 			END;
 		END;
-	FETCH NEXT FROM kursorP INTO @pozycja, @nagrodaid, @zawody_skok;
+	FETCH NEXT FROM cursorP INTO @pozycja, @nagrodaid, @zawody_skok;
 	END;
-CLOSE kursorP;
-DEALLOCATE kursorP
+CLOSE cursorP;
+DEALLOCATE cursorP
 END;
 ELSE 
 	BEGIN 
@@ -114,13 +115,13 @@ ELSE
 	END;
 END;
 
-drop procedure premia;
-EXEC premia 3
+drop procedure bonus;
+EXEC bonus 3
 SELECT * FROM zawody_kon k INNER JOIN nagroda s ON k.nagroda_id = s.id;
 
 --4 trigger will not allow to add the owner under 18 years old to horse club 
 
-CREATE TRIGGER wiek18 
+CREATE TRIGGER age18 
 ON Wlasciciel_klub
 FOR INSERT 
 AS
@@ -136,13 +137,14 @@ BEGIN
 		END;
 END;
 
-drop trigger wiek18;
+drop trigger age18;
 
 INSERT INTO Wlasciciel_klub VALUES(1, 7, '2018/09/09',null)
 INSERT INTO Wlasciciel_klub VALUES(2, 2, '2019/09/09',null)
 
 --5 trigger will not allow to delete Haflinger horse
-CREATE TRIGGER usun 
+	
+CREATE TRIGGER deleteHorse 
 ON kon
 FOR DELETE 
 AS
@@ -154,7 +156,7 @@ BEGIN
 		END;
 END;
 
-drop trigger usun;
+drop trigger deleteHorse;
 
 DELETE FROM kon WHERE id = 7;
 
